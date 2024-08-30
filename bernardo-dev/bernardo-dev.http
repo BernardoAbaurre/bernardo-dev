@@ -1,0 +1,6 @@
+@bernardo_dev_HostAddress = http://localhost:5287
+
+GET {{bernardo_dev_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
