@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using bernardo_dev.Data;
 
@@ -11,9 +12,11 @@ using bernardo_dev.Data;
 namespace bernardo_dev.Migrations
 {
     [DbContext(typeof(BernardoDevDbContext))]
-    partial class BernardoDevDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240917220838_TicTacToeFirstMigration")]
+    partial class TicTacToeFirstMigration
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -61,9 +64,6 @@ namespace bernardo_dev.Migrations
 
                     b.Property<int>("PlayerType")
                         .HasColumnType("int");
-
-                    b.Property<bool>("Turn")
-                        .HasColumnType("bit");
 
                     b.HasKey("Id");
 

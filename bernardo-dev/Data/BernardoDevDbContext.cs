@@ -1,4 +1,6 @@
-﻿using bernardo_dev.Models.Domain;
+﻿using bernardo_dev.Models.Domain.TicTacToes.Boards.Entities;
+using bernardo_dev.Models.Domain.TicTacToes.Players.Entities;
+using bernardo_dev.Models.Domain.Weathers;
 using Microsoft.EntityFrameworkCore;
 
 namespace bernardo_dev.Data
@@ -10,10 +12,11 @@ namespace bernardo_dev.Data
         }
 
         public DbSet<WeatherType> WeatherTypes { get; set; }
+        public DbSet<Board> TicTacToeBoards { get; set; }
+        public DbSet<Player> TicTacToePlayers { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            base.OnModelCreating(modelBuilder);
 
             var weatherTypes = new List<WeatherType>()
             { 
@@ -30,7 +33,15 @@ namespace bernardo_dev.Data
             };
 
             modelBuilder.Entity<WeatherType>().HasData(weatherTypes);
+            modelBuilder.Entity<Board>().ToTable("TicTacToe_Board");
 
+            modelBuilder.Entity<Player>()
+                .ToTable("TicTacToe_Player")
+                .HasOne(p => p.Board)
+                .WithMany(b => b.Players)
+                .HasForeignKey(p => p.BoardId);
+
+            base.OnModelCreating(modelBuilder);
         }
     }
 }

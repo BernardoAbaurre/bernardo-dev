@@ -1,4 +1,4 @@
-﻿namespace bernardo_dev.Models.Domain
+﻿namespace bernardo_dev.Models.Domain.Weathers
 {
     public class WeatherType
     {
