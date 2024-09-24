@@ -20,18 +20,22 @@ namespace bernardo_dev.Hubs
         private readonly IMapper mapper;
         private readonly IPlayersService playersService;
         private readonly IPlayersRepository playersRepository;
+        private readonly ILogger<TicTacToeHub> logger;
 
-        public TicTacToeHub(IBoardsService boardsService, IBoardsRepository boardsRepository, IMapper mapper, IPlayersService playersService, IPlayersRepository playersRepository)
+        public TicTacToeHub(IBoardsService boardsService, IBoardsRepository boardsRepository, IMapper mapper, IPlayersService playersService, IPlayersRepository playersRepository, ILogger<TicTacToeHub> logger)
         {
             this.boardsService = boardsService;
             this.boardsRepository = boardsRepository;
             this.mapper = mapper;
             this.playersService = playersService;
             this.playersRepository = playersRepository;
+            this.logger = logger;
         }
 
         public async Task JoinBoard(string boardId, string playerId)
         {
+            logger.LogInformation("Join log");
+
             Board board = await boardsService.Validate(boardId);
             Player player = await playersService.Validate(playerId);
 
@@ -43,6 +47,7 @@ namespace bernardo_dev.Hubs
             var response = mapper.Map<BoardResponse>(board);
 
             await Clients.Group(boardId).SendAsync("ReceiveUpdateBoard", response);
+
             await Groups.AddToGroupAsync(Context.ConnectionId, boardId);
         }
 
@@ -61,6 +66,8 @@ namespace bernardo_dev.Hubs
 
         public async Task Play(string boardId, int fieldIndex, string playerId)
         {
+            logger.LogInformation("Play log");
+            Console.WriteLine("Played: " + Context.ConnectionId);
             Board board = await boardsService.Validate(boardId);
             Player player = await playersService.Validate(playerId);
 
@@ -73,6 +80,8 @@ namespace bernardo_dev.Hubs
 
         public async Task Restart(string boardId)
         {
+            logger.LogInformation("Restart log");
+            Console.WriteLine("Restarted: " + Context.ConnectionId);
             Board board = await boardsService.Validate(boardId);
 
             await boardsService.Restart(board);
@@ -82,23 +91,25 @@ namespace bernardo_dev.Hubs
             await Clients.Group(boardId).SendAsync("ReceiveUpdateBoard", response);
         }
 
-        //public override async Task OnConnectedAsync()
-        //{
-        //    Board? board = await boardsService.GetByPlayerAsync(Context.ConnectionId);
+        public override async Task OnConnectedAsync()
+        {
+            logger.LogInformation("Connected log");
+            Console.WriteLine("Connected: " + Context.ConnectionId);
+            //Board? board = await boardsService.GetByPlayerAsync(Context.ConnectionId);
 
-        //    if (board != null)
-        //    {
-        //        Player player = await playersService.Validate(Context.ConnectionId);
+            //if (board != null)
+            //{
+            //    Player player = await playersService.Validate(Context.ConnectionId);
 
-        //        player.Connected = true;
+            //    player.Connected = true;
 
-        //        await playersRepository.UpdateAsync(player);
+            //    await playersRepository.UpdateAsync(player);
 
-        //        await Clients.Group(board.Id.ToString()).SendAsync("ReceiveUpdateBoard", player);
-        //    }
+            //    await Clients.Group(board.Id.ToString()).SendAsync("ReceiveUpdateBoard", player);
+            //}
 
-        //    await base.OnConnectedAsync();
-        //}
+            await base.OnConnectedAsync();
+        }
 
         //public async override Task OnDisconnectedAsync(Exception? exception)
         //{

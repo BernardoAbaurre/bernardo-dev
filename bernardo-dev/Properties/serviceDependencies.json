@@ -4,6 +4,13 @@
       "type": "mssql",
       "connectionId": "ConnectionStrings:BernardoDevConnectionString",
       "dynamicId": null
+    },
+    "secrets1": {
+      "type": "secrets"
+    },
+    "signalr1": {
+      "type": "signalr",
+      "connectionId": "Azure:SignalR:ConnectionString"
     }
   }
 }

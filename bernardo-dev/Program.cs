@@ -8,20 +8,37 @@ using bernardo_dev.Repositories.TicTacToes.Boards.Interfaces;
 using bernardo_dev.Repositories.TicTacToes.Players;
 using bernardo_dev.Repositories.TicTacToes.Players.Interfaces;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging.AzureAppServices;
+using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
+var logger = new LoggerConfiguration()
+    .WriteTo.Console()
+    .WriteTo.File("D:\\home\\LogFiles\\Application\\log-.txt", rollingInterval: RollingInterval.Day)
+    .MinimumLevel.Information()
+    .CreateLogger();
+
+builder.Logging.ClearProviders();
+builder.Logging.AddSerilog(logger);
+
+
+builder.Services.Configure<AzureFileLoggerOptions>(options =>
+{
+    options.FileName = "logs-";
+    options.FileSizeLimit = 50 * 1024;
+    options.RetainedFileCountLimit = 5;
+});
 
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy("AllowAll",
-        builder =>
-        {
-            builder.AllowAnyOrigin() 
-                   .AllowAnyMethod()  
-                   .AllowAnyHeader(); 
-        });
+    options.AddPolicy("AllowSpecificOrigins", builder =>
+    {
+        builder.WithOrigins("https://app-bernardo-dev-site-achuafb6ffexccdr.brazilsouth-01.azurewebsites.net", "http://localhost:4200")
+               .AllowAnyMethod()
+               .AllowAnyHeader()
+               .AllowCredentials();
+    });
 });
 
 builder.Services.AddControllers()
@@ -47,7 +64,10 @@ builder.Services.AddScoped<IBoardsService, BoardService>();
 builder.Services.AddScoped<IPlayersRepository, PlayerRepository>();
 builder.Services.AddScoped<IPlayersService, PlayerService>();
 
-builder.Services.AddSignalR();
+builder.Services.AddSignalR().AddAzureSignalR(options =>
+{
+    options.ConnectionString = builder.Configuration["Azure:SignalR:ConnectionString"];
+});
 
 var app = builder.Build();
 
@@ -60,7 +80,7 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-app.UseCors("AllowAll");
+app.UseCors("AllowSpecificOrigins");
 
 app.UseHttpsRedirection();
 

@@ -13,11 +13,13 @@ namespace bernardo_dev.Controllers.TicTacToe
     {
         private readonly IBoardsService boardsService;
         private readonly IMapper mapper;
+        private readonly ILogger<BoardsController> logger;
 
-        public BoardsController(IBoardsService boardsService, IMapper mapper)
+        public BoardsController(IBoardsService boardsService, IMapper mapper, ILogger<BoardsController> logger)
         {
             this.boardsService = boardsService;
             this.mapper = mapper;
+            this.logger = logger;
         }
 
         [HttpPost]
@@ -31,6 +33,8 @@ namespace bernardo_dev.Controllers.TicTacToe
         [HttpGet("{id}")]
         public async Task<ActionResult<BoardResponse>> GetById(string id)
         {
+
+            logger.LogInformation("Get board Log");
             Board board = await boardsService.Validate(id);
 
             return Ok(mapper.Map<BoardResponse>(board));
