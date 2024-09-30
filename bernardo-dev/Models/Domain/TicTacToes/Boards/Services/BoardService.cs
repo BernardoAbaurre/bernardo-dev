@@ -17,7 +17,7 @@ namespace bernardo_dev.Models.Domain.TicTacToes.Boards.Services
             this.boardsRepository = boardsRepository;
             this.playersService = playersService;
         }
-        public int[] CheckWinner(Board board)
+        public int[]? CheckWinner(Board board)
         {
             int[][] winningPatterns =
             {
@@ -37,12 +37,18 @@ namespace bernardo_dev.Models.Domain.TicTacToes.Boards.Services
                 FieldStatusEnum field2 = board.Fields[pattern[1]];
                 FieldStatusEnum field3 = board.Fields[pattern[2]];
 
-                if (field1 == field2 && field2 == field3)
+                if (field1 == field2 && field2 == field3 && field1 != FieldStatusEnum.Empty)
                 {
                     return pattern; 
                 }
             }
-            return [];
+
+            if (board.Fields.All(f => f != FieldStatusEnum.Empty))
+            {
+                return [];
+            }
+
+            return null;
         }
 
         public async Task<Board> NewBoard()

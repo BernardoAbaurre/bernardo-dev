@@ -10,7 +10,7 @@ namespace bernardo_dev.Models.Domain.TicTacToes.Boards.Services.Interfaces
 
         Task<Board> Validate(string boardId);
 
-        int[] CheckWinner(Board board);
+        int[]? CheckWinner(Board board);
 
         Task<Board> NewBoard();
         Task<Board> Restart(Board board);

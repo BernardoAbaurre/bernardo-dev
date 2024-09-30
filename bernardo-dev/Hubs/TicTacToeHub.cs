@@ -67,7 +67,7 @@ namespace bernardo_dev.Hubs
         public async Task Play(string boardId, int fieldIndex, string playerId)
         {
             logger.LogInformation("Play log");
-            Console.WriteLine("Played: " + Context.ConnectionId);
+
             Board board = await boardsService.Validate(boardId);
             Player player = await playersService.Validate(playerId);
 
@@ -76,6 +76,8 @@ namespace bernardo_dev.Hubs
             var response = mapper.Map<BoardResponse>(boardResult);
 
             await Clients.Group(boardId).SendAsync("ReceiveUpdateBoard", response);
+
+            await CheckWinner(boardId);
         }
 
         public async Task Restart(string boardId)
@@ -89,6 +91,18 @@ namespace bernardo_dev.Hubs
             var response = mapper.Map<BoardResponse>(board);
 
             await Clients.Group(boardId).SendAsync("ReceiveUpdateBoard", response);
+        }
+
+        public async Task CheckWinner(string boardId)
+        {
+            Board board = await boardsService.Validate(boardId);
+
+            int[]? result = boardsService.CheckWinner(board);
+
+            if(result != null)
+            {
+                await Clients.Group(boardId).SendAsync("ReceiveGameOver", result);
+            }
         }
 
         public override async Task OnConnectedAsync()
