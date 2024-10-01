@@ -49,6 +49,7 @@ namespace bernardo_dev.Hubs
             await Clients.Group(boardId).SendAsync("ReceiveUpdateBoard", response);
 
             await Groups.AddToGroupAsync(Context.ConnectionId, boardId);
+            await CheckWinner(boardId);
         }
 
         public async Task LeaveBoard(string playerId, string boardId)
