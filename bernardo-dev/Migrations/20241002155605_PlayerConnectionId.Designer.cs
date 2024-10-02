@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using bernardo_dev.Data;
 
@@ -11,9 +12,11 @@ using bernardo_dev.Data;
 namespace bernardo_dev.Migrations
 {
     [DbContext(typeof(BernardoDevDbContext))]
-    partial class BernardoDevDbContextModelSnapshot : ModelSnapshot
+    [Migration("20241002155605_PlayerConnectionId")]
+    partial class PlayerConnectionId
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

@@ -22,6 +22,7 @@ namespace bernardo_dev.Models.Domain.TicTacToes.Players.Entities
         public FieldStatusEnum PlayerType { get; set; }
         public Guid BoardId { get; set; }
         public bool Turn { get; set; }
+        public string? ConnectionId { get; set; }
 
         // Navigation property to Board
         public Board Board { get; set; }

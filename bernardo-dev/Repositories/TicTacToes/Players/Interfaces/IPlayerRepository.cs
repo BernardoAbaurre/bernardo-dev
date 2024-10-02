@@ -10,5 +10,6 @@ namespace bernardo_dev.Repositories.TicTacToes.Players.Interfaces
         Task<Player> CreateAsync(Player player);
         Task UpdateAsync();
         Task DeleteAsync(Player player);
+        Task<Player?> GetByConnectionIdAsync(string connectionId);
     }
 }

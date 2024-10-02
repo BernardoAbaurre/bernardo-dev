@@ -27,6 +27,11 @@ namespace bernardo_dev.Repositories.TicTacToes.Players
             await bernardoDevDbContext.SaveChangesAsync();
         }
 
+        public async Task<Player?> GetByConnectionIdAsync(string connectionId)
+        {
+           return await bernardoDevDbContext.TicTacToePlayers.FirstOrDefaultAsync(x => x.ConnectionId == connectionId);
+        }
+
         public async Task<Player?> GetByIdAsync(string playerId)
         {
             return await bernardoDevDbContext.TicTacToePlayers.FirstOrDefaultAsync(x => x.Id == Guid.Parse(playerId));

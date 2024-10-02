@@ -39,6 +39,7 @@ namespace bernardo_dev.Hubs
             Board board = await boardsService.Validate(boardId);
             Player player = await playersService.Validate(playerId);
 
+            player.ConnectionId = Context.ConnectionId;
             player.Connected = true;
             await playersRepository.UpdateAsync();
 
@@ -46,9 +47,9 @@ namespace bernardo_dev.Hubs
 
             var response = mapper.Map<BoardResponse>(board);
 
-            await Clients.Group(boardId).SendAsync("ReceiveUpdateBoard", response);
-
             await Groups.AddToGroupAsync(Context.ConnectionId, boardId);
+
+            await Clients.Group(boardId).SendAsync("ReceiveUpdateBoard", response);
         }
 
         public async Task LeaveBoard(string playerId, string boardId)
@@ -109,38 +110,27 @@ namespace bernardo_dev.Hubs
         {
             logger.LogInformation("Connected log");
             Console.WriteLine("Connected: " + Context.ConnectionId);
-            //Board? board = await boardsService.GetByPlayerAsync(Context.ConnectionId);
-
-            //if (board != null)
-            //{
-            //    Player player = await playersService.Validate(Context.ConnectionId);
-
-            //    player.Connected = true;
-
-            //    await playersRepository.UpdateAsync(player);
-
-            //    await Clients.Group(board.Id.ToString()).SendAsync("ReceiveUpdateBoard", player);
-            //}
-
             await base.OnConnectedAsync();
         }
 
-        //public async override Task OnDisconnectedAsync(Exception? exception)
-        //{
-        //    Board? board = await boardsService.GetByPlayerAsync(Context.ConnectionId);
+        public async override Task OnDisconnectedAsync(Exception? exception)
+        {
+            Player? player = await playersRepository.GetByConnectionIdAsync(Context.ConnectionId);
 
-        //    if (board != null)
-        //    {
-        //        Player player = await playersService.Validate(Context.ConnectionId);
+            if (player != null)
+            {
+                Board board = await boardsService.Validate(player.BoardId.ToString());
 
-        //        player.Connected = false;
+                player.Connected = false;
 
-        //        await playersRepository.UpdateAsync(player);
+                await playersRepository.UpdateAsync();
 
-        //        await Clients.Group(board.Id.ToString()).SendAsync("ReceiveUpdateBoard", player);
-        //    }
+                var response = mapper.Map<BoardResponse>(board);
 
-        //    await base.OnDisconnectedAsync(exception);
-        //}
+                await Clients.Group(board.Id.ToString()).SendAsync("ReceiveUpdateBoard", response);
+            }
+
+            await base.OnDisconnectedAsync(exception);
+        }
     }
 }
